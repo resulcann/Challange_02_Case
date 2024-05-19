@@ -1,63 +1,71 @@
+using Ali.Helper;
 using UnityEngine;
+using DG.Tweening;
 
-public class PlatformSnap : MonoBehaviour
+public class PlatformSnap : LocalSingleton<PlatformSnap>
 {
-    [SerializeField] private Transform _targetPlatform; // Mevcut platformun transformu.
-    [SerializeField] private float _snapTolerance = 0.1f; // Tolerans değeri, editörden ayarlanabilir.
-    [SerializeField] private GameObject _player; // Oyuncunun GameObject'i.
+    [SerializeField] private Transform _targetPlatform;
+    [SerializeField] private float _snapTolerance = 0.1f;
+    [SerializeField] private Transform _lastSnappedPlatform;
+    private bool _shouldSpawnPlatform = true;
 
-    void Update()
+    private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            float distance = Mathf.Abs(transform.position.z - _targetPlatform.position.z);
+            _targetPlatform = PlatformSpawner.Instance.GetLastSpawnedPlatform();
+            float distance = Mathf.Abs(transform.position.x - _targetPlatform.position.x);
             if (distance <= _snapTolerance)
             {
-                SnapToTarget();
-                PlayComboSound(); // Combo ses fonksiyonu.
+                PerfectSnap();
+                Debug.Log("Perfect Snap!");
+            }
+            else if(distance < 2.75f)
+            {
+                NormalSnap();
+                Debug.Log("Normal Snap!");
             }
             else
             {
-                BreakAndSnapOrFall(distance); // Yanlış snapleme durumunda kırma veya düşme işlemi.
+                BadSnap();
+                Debug.Log("Bad Snap!");
             }
         }
     }
 
-    private void SnapToTarget()
+    private void PerfectSnap()
     {
-        transform.position = new Vector3(transform.position.x, transform.position.y, _targetPlatform.position.z);
-        // Platformu tam olarak hedefe yerleştir.
+        _targetPlatform.DOKill();
+        _targetPlatform.DOMoveX(_lastSnappedPlatform.position.x, 1f).SetSpeedBased().SetEase(Ease.OutBack);
+        SetLastSnappedPlatform(_targetPlatform);
     }
 
-    private void BreakAndSnapOrFall(float distance)
+    private void NormalSnap()
     {
-        if (distance <= _targetPlatform.localScale.z / 2) // Eğer platform yarısından fazla doğru pozisyonda ise
+        _targetPlatform.DOKill();
+        _targetPlatform.DOMoveX(_targetPlatform.position.x, 1f).SetSpeedBased().SetEase(Ease.OutBack);
+        SetLastSnappedPlatform(_targetPlatform);
+    }
+    private void BadSnap()
+    {
+        _targetPlatform.DOKill();
+        _targetPlatform.GetComponent<Rigidbody>().isKinematic = false;
+
+        // GAME LOSE YAPILACAK
+    }
+    public Transform GetLastSnappedPlatform() => _lastSnappedPlatform;
+    public void SetLastSnappedPlatform(Transform lastPlatform)
+    {
+        _lastSnappedPlatform = lastPlatform;
+        AllowNextPlatformSpawn();
+        if (_shouldSpawnPlatform)
         {
-            // Kırılacak parça hesaplamaları ve uygulaması.
-            float breakPoint = _targetPlatform.position.z + (_targetPlatform.localScale.z / 2) * Mathf.Sign(transform.position.z - _targetPlatform.position.z);
-            BreakPlatform(breakPoint);
-            SnapToTargetPartially(breakPoint); // Platformun doğru kısmını yerleştir.
-        }
-        else
-        {
-            // Platform tamamen yanlış yerleştirilmişse, karakter düşsün.
-            _player.GetComponent<PlayerController>().Fall();
+            PlatformSpawner.Instance.SpawnPlatform(); // Snapleme işlemi tamamlandıktan sonra yeni platform spawn et
+            _shouldSpawnPlatform = false;  // Bir sonraki snap'e kadar spawn engelle
         }
     }
-
-    private void BreakPlatform(float breakPoint)
+     public void AllowNextPlatformSpawn()
     {
-        // Platformun belirlenen noktadan kırılmasını ve kırılan parçanın düşürülmesini sağla.
-    }
-
-    private void SnapToTargetPartially(float snapPoint)
-    {
-        // Yalnızca doğru olan kısmı hedefe snaple.
-        transform.position = new Vector3(transform.position.x, transform.position.y, snapPoint);
-    }
-
-    private void PlayComboSound()
-    {
-        // Combo başarılı olduğunda ses oynat.
+        _shouldSpawnPlatform = true;  // Snapleme işlemi tamamlandıktan sonra yeni spawn izni
     }
 }
