@@ -17,9 +17,9 @@ public class PlayerController : LocalSingleton<PlayerController>
         
         if (PlatformSnap.Instance.GetLastSnappedPlatform() != null)
         {
-            float targetX = PlatformSnap.Instance.GetLastSnappedPlatform().position.x;
-            Vector3 targetPosition = new Vector3(targetX, _rb.position.y, _rb.position.z);
-            Vector3 newPosition = Vector3.Lerp(_rb.position, targetPosition, _centeringSpeed * Time.deltaTime);
+            var targetX = PlatformSnap.Instance.GetLastSnappedPlatform().GetComponent<SliceableObject>().GetCenterXPoint();
+            var targetPosition = new Vector3(targetX, _rb.position.y, _rb.position.z);
+            var newPosition = Vector3.Lerp(_rb.position, targetPosition, _centeringSpeed * Time.deltaTime);
             _rb.MovePosition(newPosition);
         }
     }
