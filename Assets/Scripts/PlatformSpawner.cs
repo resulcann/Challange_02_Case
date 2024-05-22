@@ -1,5 +1,5 @@
-using Ali.Helper;
 using UnityEngine;
+using Utilities;
 
 public class PlatformSpawner : LocalSingleton<PlatformSpawner>
 {
@@ -15,22 +15,12 @@ public class PlatformSpawner : LocalSingleton<PlatformSpawner>
     {
         base.Awake();
         _lastSpawnedPlatform = _initialLastPlatform;
-        SpawnPlatform(5.5f); // Başlangıçta hemen bir platform spawnla
     }
-
+    
     public void SpawnPlatform(float zOffset = 2.75f)
     {
         Vector3 spawnPosition = _lastSpawnedPlatform.position + new Vector3(0, 0, zOffset);
         float side = _spawnFromLeft ? -10 : 10;
-        // var newPlatform = PoolManager.Instance.SpawnPlatform();
-        // if(newPlatform)
-        // {
-        //     newPlatform.transform.SetParent(PoolManager.Instance.GetPlatformPool().transform);
-        //     newPlatform.transform.position = spawnPosition;
-        //     newPlatform.transform.rotation = Quaternion.identity;
-        //     newPlatform.transform.localScale = new Vector3(PlatformSnap.Instance.GetLastSnappedPlatform().localScale.x, 
-        //         newPlatform.transform.localScale.y, newPlatform.transform.localScale.z);
-        // }
         var newPlatform = Instantiate(PlatformSnap.Instance.GetLastSnappedPlatform().gameObject, spawnPosition,
             Quaternion.identity, PoolManager.Instance.GetPlatformPool().transform);
         var platformRenderer = newPlatform.GetComponent<Renderer>();

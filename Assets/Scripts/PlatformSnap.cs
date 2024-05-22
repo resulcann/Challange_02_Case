@@ -1,6 +1,10 @@
-using Ali.Helper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using DG.Tweening;
+using Utilities;
+using Random = UnityEngine.Random;
 
 public class PlatformSnap : LocalSingleton<PlatformSnap>
 {
@@ -8,46 +12,61 @@ public class PlatformSnap : LocalSingleton<PlatformSnap>
     [SerializeField] private Transform _targetPlatform;
     [SerializeField] private float _snapTolerance = 0.1f;
     [SerializeField] private Transform _lastSnappedPlatform;
+    private int _perfectSnapCount = 0;
+    private List<FinishLine> _finishLines = new();
+
+    private void Start()
+    {
+        _finishLines = FindObjectsOfType<FinishLine>().ToList();
+    }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && GameManager.Instance.IsGamePlayStarted && !GameManager.Instance.IsGamePlayFinished)
         {
             _targetPlatform = PlatformSpawner.Instance.GetLastSpawnedPlatform();
             var distance = Mathf.Abs(_lastSnappedPlatform.position.x - _targetPlatform.position.x);
             
             if (distance <= _snapTolerance)
             {
-                PerfectSnap();
                 Debug.Log("Perfect Snap!");
+                PerfectSnap();
             }
             else if(distance <= _lastSnappedPlatform.GetComponent<Collider>().bounds.size.x)
             {
-                NormalSnap();
                 Debug.Log("Normal Snap!");
+                NormalSnap();
+                ResetCombo();
             }
             else
             {
-                BadSnap();
                 Debug.Log("Bad Snap!");
+                BadSnap();
+                ResetCombo();
             }
         }
     }
 
     private void PerfectSnap()
     {
+        var pitch = 1.0f + (0.05f * _perfectSnapCount);
+        _perfectSnapCount++;
+        
         _targetPlatform.DOKill();
-        _targetPlatform.DOMoveX(_lastSnappedPlatform.position.x, 1f).SetSpeedBased().SetEase(Ease.Linear);
+        _targetPlatform.DOMoveX(_lastSnappedPlatform.position.x, 5f).SetSpeedBased().SetEase(Ease.Linear);
         SetLastSnappedPlatform(_targetPlatform);
+        
+        AudioPool.Instance.PlayClipByName("combo", false, 0.2f, pitch);
     }
 
     private void NormalSnap()
     {
         _targetPlatform.DOKill();
-        _targetPlatform.DOMoveX(_targetPlatform.position.x, 1f).SetSpeedBased().SetEase(Ease.Linear);
+        _targetPlatform.DOMoveX(_targetPlatform.position.x, 5f).SetSpeedBased().SetEase(Ease.Linear);
 
         var sliceableObject = _targetPlatform.GetComponent<SliceableObject>();
         sliceableObject.Slice(_meshSlicer);
+        AudioPool.Instance.PlayClipByName("slice", false, 0.2f, Random.Range(0.9f, 1.1f));
     }
 
     private void BadSnap()
@@ -56,12 +75,22 @@ public class PlatformSnap : LocalSingleton<PlatformSnap>
         _targetPlatform.GetComponent<Rigidbody>().isKinematic = false;
         // GAME LOSE YAPILACAK
     }
-
+    
+    private void ResetCombo()
+    {
+        _perfectSnapCount = 0;
+    }
+    
     public Transform GetLastSnappedPlatform() => _lastSnappedPlatform;
 
     public void SetLastSnappedPlatform(Transform lastPlatform)
     {
         _lastSnappedPlatform = lastPlatform;
+        // son snaplenen platform finishline'a yakınsa artık daha fazla platform spawnlama.
+        if (_finishLines.Any(line => Vector3.Distance(line.transform.position,lastPlatform.position) < _lastSnappedPlatform.localScale.z))
+        {
+            return;
+        }
         PlatformSpawner.Instance.SpawnPlatform();
     }
 }

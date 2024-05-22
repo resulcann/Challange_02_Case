@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3809120852206388915}
-  - component: {fileID: 3809120852206388916}
+  - component: {fileID: 314126772738035713}
   - component: {fileID: 3809120852206388917}
   - component: {fileID: 3809120852206388919}
   m_Layer: 0
@@ -35,7 +35,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3809120852206388916
+--- !u!114 &314126772738035713
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,10 +47,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 767a9f543e0902a43ae77e17b7e4db93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 2.5
+  _speed: 2.75
+  _centeringSpeed: 5
   _rb: {fileID: 3809120852206388917}
   _collider: {fileID: 3809120852206388919}
-  _centeringSpeed: 1.75
+  _simpleAnimancer: {fileID: 1575094807}
+  _virtualCamera: {fileID: 0}
+  _finishLineLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!54 &3809120852206388917
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -87,6 +92,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3809120852206388915}
     m_Modifications:
+    - target: {fileID: 1782327572533206788, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4978699718255468484, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
       propertyPath: m_Name
       value: Chibi
@@ -145,8 +154,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
+--- !u!95 &2629647750374370730 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1782327572533206788, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
+  m_PrefabInstance: {fileID: 4378197893782303406}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8259124969993533392 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5646447060418037118, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
   m_PrefabInstance: {fileID: 4378197893782303406}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8779097640436870506 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4978699718255468484, guid: 8ebf841af362818409cf000d8f1a2345, type: 3}
+  m_PrefabInstance: {fileID: 4378197893782303406}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1575094806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779097640436870506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ad50f81b1d25c441943c37a89ba23f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Animator: {fileID: 2629647750374370730}
+  _ActionOnDisable: 0
+--- !u!114 &1575094807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779097640436870506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a038e9aa82a0aa489fb78c44a8143a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animancer: {fileID: 1575094806}
+  _fadeDuration: 0.1
+  _clips:
+  - {fileID: -203655887218126122, guid: 384322f3c2ca37643ac5d1837ba7ebfd, type: 3}
+  - {fileID: -203655887218126122, guid: eb56449bc22f84d45933a09356972881, type: 3}
+  - {fileID: -203655887218126122, guid: cb270ab2e98f25149a4aeca27ade9882, type: 3}
+  - {fileID: -203655887218126122, guid: 51fe6fcabd987bc44a6ac8b13b459b1c, type: 3}
+  _playDefault: 1
