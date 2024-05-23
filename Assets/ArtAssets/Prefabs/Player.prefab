@@ -49,13 +49,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 2.75
   _centeringSpeed: 5
+  _modelTransform: {fileID: 8259124969993533392}
   _rb: {fileID: 3809120852206388917}
   _collider: {fileID: 3809120852206388919}
   _simpleAnimancer: {fileID: 1575094807}
   _virtualCamera: {fileID: 0}
-  _finishLineLayer:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!54 &3809120852206388917
 Rigidbody:
   m_ObjectHideFlags: 0

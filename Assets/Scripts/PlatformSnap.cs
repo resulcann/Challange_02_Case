@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 using Utilities;
-using Random = UnityEngine.Random;
 
 public class PlatformSnap : LocalSingleton<PlatformSnap>
 {
@@ -76,7 +74,7 @@ public class PlatformSnap : LocalSingleton<PlatformSnap>
         // GAME LOSE YAPILACAK
     }
     
-    private void ResetCombo()
+    public void ResetCombo()
     {
         _perfectSnapCount = 0;
     }
@@ -87,7 +85,8 @@ public class PlatformSnap : LocalSingleton<PlatformSnap>
     {
         _lastSnappedPlatform = lastPlatform;
         // son snaplenen platform finishline'a yakınsa artık daha fazla platform spawnlama.
-        if (_finishLines.Any(line => Vector3.Distance(line.transform.position,lastPlatform.position) < _lastSnappedPlatform.localScale.z))
+        if (_finishLines.Any(line => Mathf.Abs(line.transform.position.z - lastPlatform.position.z) < _lastSnappedPlatform.localScale.z)
+            || GameManager.Instance.IsGamePlayFinished || !GameManager.Instance.IsGamePlayStarted)
         {
             return;
         }

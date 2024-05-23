@@ -7,14 +7,22 @@ public class PlayerController : LocalSingleton<PlayerController>
 {
     [SerializeField] private float _speed = 5.0f;
     [SerializeField] private float _centeringSpeed = 2.0f;
-    [Space] [Header("REFS")]
+
+    [Space] [Header("REFS")] 
+    [SerializeField] private Transform _modelTransform;
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private Collider _collider;
     [SerializeField] private SimpleAnimancer _simpleAnimancer;
     [SerializeField] private CinemachineVirtualCamera _virtualCamera;
     private bool _canMove = false;
 
-
+    public void Init()
+    {
+        _modelTransform.localPosition = Vector3.zero;
+        _modelTransform.localEulerAngles = Vector3.zero;
+        _canMove = false;
+        _simpleAnimancer.PlayAnimation("Idle");
+    }
     private void Start()
     {
         GameManager.OnGameplayStarted += StartMoving;
@@ -58,11 +66,12 @@ public class PlayerController : LocalSingleton<PlayerController>
             if (!finishLine.GetIsTriggered())
             {
                 finishLine.SetIsTriggered(true);
-                StopMoving();
                 GameManager.Instance.FinishGamePlay(true);
                 transform.DOMoveX(other.transform.position.x, 0.25f).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     _simpleAnimancer.PlayAnimation("Dance");
+                    finishLine.PlatformRiseUp();
+                    PlatformSnap.Instance.SetLastSnappedPlatform(finishLine.GetPlatform());
                 });
             }
         }

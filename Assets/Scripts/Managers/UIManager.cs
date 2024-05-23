@@ -19,10 +19,10 @@ public class UIManager : LocalSingleton<UIManager>
     private Tweener _punchImageTweener;
     private Tweener _smoothTween;
     private Tweener _rotationTweener;
-    
+
     public void Init()
     {
-        _currentLevelText.text = "Level " + (1);
+        _currentLevelText.text = $"Level {GameManager.Instance.GetLevelIndex() + 1}";
         _tapToStartButton.gameObject.SetActive(true);
         ShowLosePanel(false);
         ShowWinPanel(false);
@@ -39,7 +39,12 @@ public class UIManager : LocalSingleton<UIManager>
     }
     public void OnNextButtonClick()
     {
-        SceneManager.LoadScene(0);
+        if (GameManager.Instance.GetLevelIndex() > 2)
+        {
+            SceneManager.LoadScene(0);
+            return;
+        }
+        GameManager.Instance.Init();
     }
 
     public void OnTryAgainButtonClick()
